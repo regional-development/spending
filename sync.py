@@ -1,11 +1,13 @@
 import json
+import logging
 import itertools
 import requests
 import pandas as pd
+from datetime import date, timedelta
 
 URL = "https://spending.gov.ua/portal-api/v2/api/transactions/page/" 
-DATE = "2020-09-16"
-START_PAGE = 1263
+DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
+START_PAGE = 0
 
 
 def fetch(session):
@@ -15,6 +17,7 @@ def fetch(session):
             "startdate": DATE, "enddate": DATE
         }
         data = session.get(URL, params=params).json()
+        logging.info(f"requests page {page}")
         if data.get("transactions"):
             yield {
                 "date": DATE, 
@@ -32,7 +35,7 @@ def fetch_all():
         
 def main():
     data = pd.DataFrame(fetch_all())
-    data.to_csv("data/sample.csv", index=False)
+    data.to_csv(f"data/{DATE}.csv", index=False)
 
 
 if __name__ == "__main__":
