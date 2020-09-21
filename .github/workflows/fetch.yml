@@ -2,20 +2,29 @@ name: fetch
 
 on:
   schedule:
-    - cron: '0 20 * * *'
+    - cron: '0 19 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - run: |
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Install dependencies
+        run: |
          pip install -r requirements.txt
+      - name: Fetch data
+        run: |-
          python sync.py
+         YESTERDAY=$(date --date=' 1 days ago' '+%F')
+         zip data/$YESTERDAY.zip data/$YESTERDAY.csv
+      - name: Commit and push if changed
+        run: |-
          git diff
          git config --local user.email "action@github.com"
          git config --local user.name "GitHub Action"
-         git add data/*.csv
+         git add data/*.zip
          git commit -m "Add files via upload" || exit 0
-         git push 
+         git push пп
