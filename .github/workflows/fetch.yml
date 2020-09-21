@@ -27,4 +27,4 @@ jobs:
          git config --local user.name "GitHub Action"
          git add data/*.zip
          git commit -m "Add files via upload" || exit 0
-         git push пп
+         git push
