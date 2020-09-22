@@ -1,13 +1,9 @@
 import json
-import logging
-import itertools
 import requests
 import pandas as pd
-from datetime import date, timedelta
+
 
 URL = "https://spending.gov.ua/portal-api/v2/api/transactions/page/" 
-DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-START_PAGE = 0
 
 
 def fetch(session, params):
@@ -33,6 +29,6 @@ def fetch_all(date_range):
             
 def main():
     data = fetch_all(
-        ["2020-04-01", "2020-04-02", "2020-04-03", "2020-04-04"]
+        ["2020-04-01", "2020-04-02", "2020-04-03"]
     )
     pd.DataFrame(data).to_csv("./data/multiple_dates.csv", index=False)
