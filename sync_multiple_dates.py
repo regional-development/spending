@@ -7,10 +7,9 @@ URL = "https://spending.gov.ua/portal-api/v2/api/transactions/page/"
 
 
 def fetch(session, params):
-    next_page, last_page = 0, 100
+    next_page, last_page = 0, 0
     while next_page <= last_page:
         params["page"] = next_page
-        print(f"{params.get('startdate')=}, {next_page=}, {last_page=}")
         data = session.get(URL, params=params).json()
         yield {
             "date": params.get("startdate"), 
@@ -28,7 +27,14 @@ def fetch_all(date_range):
             
             
 def main():
-    data = fetch_all(
-        ["2020-04-01", "2020-04-02", "2020-04-03"]
-    )
-    pd.DataFrame(data).to_csv("./data/multiple_dates.csv", index=False)
+    date_range = [
+        date.strftime("%Y-%m-%d") 
+        for date in pd.bdate_range(start='9/1/2020', end='9/23/2020').date
+    ]
+    data = fetch_all(date_range)
+    results = pd.DataFrame(data)
+    results.to_csv(f"data/{date_range[0]}_{date_range[-1]}.csv", index=False)
+
+
+if __name__ == "__main__":
+    main()
