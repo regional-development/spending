@@ -1,43 +1,28 @@
-import json
-import logging
-import itertools
 import requests
 import pandas as pd
 from datetime import date, timedelta
 
-URL = "https://spending.gov.ua/portal-api/v2/api/transactions/page/" 
+
 DATE = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
-START_PAGE = 0
+URL = "https://spending.gov.ua/portal-api/v2/api/transactions/page/" 
 
 
-def fetch(session):
-    for page in itertools.count(START_PAGE):
-        params = {
-            "page": page, "pageSize": 100, 
-            "startdate": DATE, "enddate": DATE
-        }
+def fetch(session, params):
+    next_page, last_page = 0, 0
+    while next_page <= last_page:
+        params["page"] = next_page
         data = session.get(URL, params=params).json()
-        logging.info(f"requests page {page}")
-        if data.get("transactions"):
-            yield {
-                "date": DATE, 
-                "page": page, 
-                "raw_json": json.dumps(data)
-            }
-        else:
-            break
-        
+        yield pd.json_normalize(data.get("transactions"))\
+                .assign(page=params.get("page"))
+        next_page, last_page = next_page+1, data["count"] // data["pageSize"]
+                
         
 def fetch_all():
     with requests.Session() as session:
-        yield from fetch(session)
+        params = {"page": 0, "pageSize": 100, "startdate": DATE, "enddate": DATE}
+        yield from fetch(session, params)
         
         
-def main():
-    data = pd.DataFrame(fetch_all())
-    data.to_csv(f"data/{DATE}.csv", index=False)
-
-
 if __name__ == "__main__":
-    main()
-    
+    data = fetch_all()
+    pd.concat(data).to_csv(f"data/{DATE}.csv", index=False)
