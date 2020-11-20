@@ -2,7 +2,7 @@ name: fetch
 
 on:
   schedule:
-    - cron: '0 19 * * 2-6'
+    - cron: '0 19 * * 3,4,5,6,7,0'
 
 jobs:
   build:
@@ -18,8 +18,8 @@ jobs:
       - name: Fetch data
         run: |-
          python main.py
-         YESTERDAY=$(date --date=' 1 days ago' '+%F')
-         zip data/$YESTERDAY.zip data/$YESTERDAY.csv
+         DATE=$(date --date=' 2 days ago' '+%F')
+         zip data/$DATE.zip data/$DATE.csv
       - name: Commit and push if changed
         run: |-
          git diff
