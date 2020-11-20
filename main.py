@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from typing import Any, Dict, Iterator
 
 
-DATE = date.today() - timedelta(days=1)
+DATE = date.today() - timedelta(days=2)
 PATH = Path(__file__).resolve().parent / "data"
 URL = "https://spending.gov.ua/portal-api/v2/api/transactions/page/" 
 
