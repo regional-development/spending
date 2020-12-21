@@ -19,7 +19,7 @@ jobs:
         run: |-
          python main.py
          DATE=$(date --date=' 2 days ago' '+%F')
-         zip -r data/$DATE.zip data/
+         zip data/$DATE.zip data/
       - name: Commit and push if changed
         run: |-
          git diff
